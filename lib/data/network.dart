@@ -7,11 +7,9 @@ import 'package:http/http.dart';
 
 class Network{
   Future<dynamic> getMethod(String url) async {
-    try {
+     try {
       Uri uri = Uri.parse(url);
-      final Response response = await get(uri, headers: {
-        'content-type': 'Application/json',
-       });
+      final Response response = await get(uri);
       log(response.body);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);

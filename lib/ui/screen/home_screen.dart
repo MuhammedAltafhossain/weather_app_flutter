@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/ui/getx/weather_controller.dart';
 
 import '../../data/model/location_service.dart';
@@ -12,19 +13,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  WeatherController weatherController= Get.put(WeatherController());
+  WeatherController weatherController = Get.put(WeatherController());
 
-  String? let, long, country, adminArea;
-
+  String? let;
+  String? long;
+  String? country, adminArea;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // getLocation();
-    weatherController.getWeather(let!, long!);
+    getLocation();
   }
 
+  double kelvinToCelsius(double kelvin) {
+    return kelvin - 273.15;
+  }
 
   void getLocation() async {
     final service = LocationService();
@@ -33,12 +37,22 @@ class _HomeScreenState extends State<HomeScreen> {
       final placeMark = await service.getPlaceMark(locationData: locationData);
 
       setState(() {
-        let = locationData.latitude!.toStringAsFixed(6);
-        long = locationData.longitude!.toStringAsFixed(6);
-        country = '${placeMark?.street}, ${placeMark?.subLocality}, ${placeMark?.locality}, ${placeMark?.country} ';
-
+        let = locationData.latitude!.toStringAsFixed(2);
+        long = locationData.longitude!.toStringAsFixed(2);
+        weatherController.getWeather(let ?? '', long ?? '').then((value) => {
+        if(value == false){
+          Get.snackbar(
+          "error",
+          "Data Fatch Error. Please Try Again...!",
+          colorText: Colors.white,
+          backgroundColor: Colors.lightBlue,
+          icon: const Icon(Icons.add_alert),
+        )
+      }});
+        country =
+        '${placeMark?.street}, ${placeMark?.subLocality}, ${placeMark?.locality}, ${placeMark?.country} ';
       });
-     }
+    }
   }
 
   @override
@@ -47,9 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           "Flutter Weather",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.deepPurple,
         actions: const [
           Icon(
             Icons.settings,
@@ -67,62 +81,112 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        color: Colors.blue.shade800,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Boise',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2.2),
-            ),
-            Text(
-              'Updated : 3:38 PM',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1),
-            ),
-            SizedBox(
-              height: 20,
-            ), 
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+      body: GetBuilder<WeatherController>(builder: (controller) {
+        if (controller.getWeatherInProgress) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        final weather = controller.weatherModel.weather?.first;
+        final main = controller.weatherModel.main;
+        final max = kelvinToCelsius(main?.tempMax ?? 0.0);
+        final min = kelvinToCelsius(main?.tempMin ?? 0.0);
+        final temp = kelvinToCelsius(main?.temp ?? 0.0);
+        return RefreshIndicator(
+          onRefresh: () async {
+            getLocation();
+          },
+          child: Stack(children: [
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/images/weather.png',
-                  width: 80,
-                  fit: BoxFit.scaleDown,
+                Text(
+                  controller.weatherModel.name ?? '',
+                  style: const TextStyle(
+                      color: Colors.deepPurple,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2.2,
+                      fontFamily: 'Kanit'),
                 ),
                 Text(
-                  'Updated : 3:38 PM',
-                  style: TextStyle(
-                      color: Colors.white,
+                  'Updated : ${DateFormat('hh:mm:ss a').format(
+                      DateTime.now())}',
+                  style: const TextStyle(
+                      color: Colors.deepPurple,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: 1),
+                      letterSpacing: 1,
+                      fontFamily: 'Kanit'),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/weather.png',
+                        width: 80,
+                        fit: BoxFit.scaleDown,
+                      ),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      Text(
+                        '${temp.toStringAsFixed(0)}\u00B0',
+                        style: const TextStyle(
+                            color: Colors.deepPurple,
+                            fontSize: 40,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1,
+                            fontFamily: 'Kanit'),
+                      ),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            'max: ${max.toStringAsFixed(0)}\u00B0',
+                            style: const TextStyle(
+                                color: Colors.deepPurple,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
+                                fontFamily: 'Kanit'),
+                          ),
+                          Text(
+                            'min: ${min.toStringAsFixed(0)}\u00B0 ',
+                            style: const TextStyle(
+                                color: Colors.deepPurple,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
+                                fontFamily: 'Kanit'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 Text(
-                  'Updated : 3:38 PM',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
+                  weather?.main ?? '',
+                  style: const TextStyle(
+                      color: Colors.deepPurple,
+                      fontSize: 30,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: 1),
+                      letterSpacing: 1,
+                      fontFamily: 'Kanit'),
                 ),
               ],
-            )
-          ],
-        ),
-      ),
+            ),
+          ]),
+        );
+      }),
     );
   }
 }

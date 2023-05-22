@@ -16,7 +16,7 @@ class WeatherController extends GetxController{
     final result = await Network().getMethod(Urls.baseUrl(lat, lon));
     getWeatherInProgress = false;
     update();
-
+    print('result ${result}');
     if(result != null){
       weatherModel = WeatherModel.fromJson(result);
       update();

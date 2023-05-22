@@ -29,21 +29,21 @@ class WeatherModel {
         this.cod});
 
   WeatherModel.fromJson(Map<String, dynamic> json) {
-    coord = json['coord'] != null ? new Coord.fromJson(json['coord']) : null;
+    coord = json['coord'] != null ? Coord.fromJson(json['coord']) : null;
     if (json['weather'] != null) {
       weather = <Weather>[];
       json['weather'].forEach((v) {
-        weather!.add(new Weather.fromJson(v));
+        weather!.add(Weather.fromJson(v));
       });
     }
     base = json['base'];
-    main = json['main'] != null ? new Main.fromJson(json['main']) : null;
+    main = json['main'] != null ? Main.fromJson(json['main']) : null;
     visibility = json['visibility'];
-    wind = json['wind'] != null ? new Wind.fromJson(json['wind']) : null;
+    wind = json['wind'] != null ? Wind.fromJson(json['wind']) : null;
     clouds =
-    json['clouds'] != null ? new Clouds.fromJson(json['clouds']) : null;
+    json['clouds'] != null ? Clouds.fromJson(json['clouds']) : null;
     dt = json['dt'];
-    sys = json['sys'] != null ? new Sys.fromJson(json['sys']) : null;
+    sys = json['sys'] != null ? Sys.fromJson(json['sys']) : null;
     timezone = json['timezone'];
     id = json['id'];
     name = json['name'];
@@ -51,7 +51,7 @@ class WeatherModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (coord != null) {
       data['coord'] = coord!.toJson();
     }
@@ -93,7 +93,7 @@ class Coord {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['lon'] = lon;
     data['lat'] = lat;
     return data;
@@ -116,7 +116,7 @@ class Weather {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['main'] = main;
     data['description'] = description;
@@ -157,7 +157,7 @@ class Main {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['temp'] = temp;
     data['feels_like'] = feelsLike;
     data['temp_min'] = tempMin;
@@ -184,7 +184,7 @@ class Wind {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['speed'] = speed;
     data['deg'] = deg;
     data['gust'] = gust;
@@ -202,7 +202,7 @@ class Clouds {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['all'] = all;
     return data;
   }
@@ -226,7 +226,7 @@ class Sys {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['type'] = type;
     data['id'] = id;
     data['country'] = country;
