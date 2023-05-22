@@ -45,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
           "error",
           "Data Fatch Error. Please Try Again...!",
           colorText: Colors.white,
-          backgroundColor: Colors.lightBlue,
-          icon: const Icon(Icons.add_alert),
+          backgroundColor: Colors.deepPurple.shade100,
+          icon: const Icon(Icons.error),
         )
       }});
         country =
